@@ -1,1 +1,1 @@
-require File.join(File.dirname(__FILE__), 'aptinstaller', 'aptinstaller')
+require File.join(File.dirname(__FILE__), 'aptinstaller', '*.rb')

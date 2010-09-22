@@ -1,5 +1,5 @@
 require 'yaml'
-
+require 'rush'
 class AptInstaller
 
   def self.autopkg(opts = {})
@@ -22,9 +22,9 @@ class AptInstaller
     end
   end
 
-  def self.autopkg_install(rails_root = '.')
-    rails_root ||= '.' # in case they pass in nil
-    config_yaml = self.read_yaml_file(File.join(rails_root, 'config', 'aptinstaller.yml'))
+  def self.autopkg_install(pkg_config_root = '.', )
+    pkg_config_root ||= '.' # in case they pass in nil
+    config_yaml = self.read_yaml_file(File.join(pkg_config_root, 'config', 'aptinstaller.yml'))
     packages = self.detect_packages_to_install(config_yaml['packages'])
     if `which apt-get`.size == 0
       $stderr.write "I'm sorry, but we currently only support apt based package systems\n"
@@ -49,11 +49,7 @@ class AptInstaller
   def self.read_yaml_file(config_file)
     raise "Error reading config file, no :config parameter specified" unless config_file
     begin
-      begin
-        config = File.new(config_file, 'r').read
-      rescue
-        config = File.new(File.join(RAILS_ROOT, config_file), 'r').read
-      end
+      config = Rush[config_file]
     rescue => ex
       raise "Error reading config file at #{config_file}"
     end
@@ -76,17 +72,12 @@ class AptInstaller
   end
 
   def self.detect_package(package)
-    info = `aptitude show #{package['name']}`.split("\n")
-    meta = {}
-    info.each{|i|
-      i = i.split(": ")
-      meta[i[0]] = i[1]
-    }
-    return meta['State'] == 'installed'
+    missing = Rush.bash("'#{packager_config['detect']}' '#{package['name']}'").split(/\n/).last.match(/^i.*/)
+    return !missing
   end
 
   def self.verify_version(package)
     pkg_name = package['name']
-    return true if package['version'] == nil
+    return true if package['version'].nil?
   end
 end

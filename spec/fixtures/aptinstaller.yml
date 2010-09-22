@@ -1,0 +1,4 @@
+packaging:
+  packages:
+    - name: nginx
+    - name: sphinx

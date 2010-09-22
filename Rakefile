@@ -7,7 +7,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
     s.name = "aptinstaller"
-    s.summary = "TODO"
+    s.summary = "Automatically install a project's dependencies via apt-get "
     s.email = "nick@smartlogicsolutions.com"
     s.homepage = "http://github.com/ngauthier/aptinstaller"
     s.description = "README.txt"
